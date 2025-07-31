@@ -84,3 +84,60 @@ def get_apim_metrics(resource_id: str, metric_names: List[str], timespan: dateti
             "MemoryPercentage": 65.0,
             "Requests": 5000000.0
         }
+
+def list_all_apim_instances(subscription_id: str) -> List[Dict[str, Any]]:
+    """
+    Lists all APIM instances in a given subscription.
+
+    In a real implementation, this would use the azure-mgmt-apimanagement client
+    to list all services across all resource groups.
+
+    Args:
+        subscription_id: The ID of the subscription to scan.
+
+    Returns:
+        A list of dictionaries, where each dictionary is the full resource object
+        of an APIM instance.
+    """
+    print(f"---AZURE TOOL (MOCK): Listing all APIM instances in subscription {subscription_id}---")
+
+    # This mock data simulates a scenario with instance sprawl, where multiple
+    # underutilized instances exist that could be candidates for consolidation.
+    return [
+        {
+            "id": f"/subscriptions/{subscription_id}/resourceGroups/rg-prod-1/providers/Microsoft.ApiManagement/service/apim-prod-eus",
+            "name": "apim-prod-eus",
+            "sku": {"name": "Premium", "capacity": 2},
+            "properties": {
+                "virtualNetworkType": "External",
+                "additionalLocations": []
+            }
+        },
+        {
+            "id": f"/subscriptions/{subscription_id}/resourceGroups/rg-dev-1/providers/Microsoft.ApiManagement/service/apim-dev-wus",
+            "name": "apim-dev-wus",
+            "sku": {"name": "Developer", "capacity": 1},
+            "properties": {
+                "virtualNetworkType": "None",
+                "additionalLocations": []
+            }
+        },
+        {
+            "id": f"/subscriptions/{subscription_id}/resourceGroups/rg-staging-1/providers/Microsoft.ApiManagement/service/apim-staging-eus",
+            "name": "apim-staging-eus",
+            "sku": {"name": "Basic", "capacity": 1},
+            "properties": {
+                "virtualNetworkType": "None",
+                "additionalLocations": []
+            }
+        },
+        {
+            "id": f"/subscriptions/{subscription_id}/resourceGroups/rg-legacy-1/providers/Microsoft.ApiManagement/service/apim-legacy-wus",
+            "name": "apim-legacy-wus",
+            "sku": {"name": "Basic", "capacity": 1},
+            "properties": {
+                "virtualNetworkType": "None",
+                "additionalLocations": []
+            }
+        }
+    ]

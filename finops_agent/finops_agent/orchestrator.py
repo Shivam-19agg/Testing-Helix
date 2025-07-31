@@ -13,6 +13,7 @@ class AgentState(TypedDict):
 # --- Node Imports ---
 # Use a relative import to refer to a module within the same package.
 from .nodes.analysis.tier_rightsizing import tier_rightsizing_analysis_node
+from .nodes.analysis.instance_consolidation import instance_consolidation_analysis_node
 
 
 # --- Core Workflow Functions ---
@@ -57,13 +58,14 @@ def build_graph():
     # Add nodes to the graph
     workflow.add_node("discover", discovery_node)
     workflow.add_node("tier_rightsizing_analysis", tier_rightsizing_analysis_node)
-    # TODO: Add other analysis nodes here and run them in parallel.
+    workflow.add_node("instance_consolidation_analysis", instance_consolidation_analysis_node)
     workflow.add_node("finalize", finalize_node)
 
-    # Define the workflow edges
+    # Define the workflow edges to run sequentially for now
     workflow.set_entry_point("discover")
     workflow.add_edge("discover", "tier_rightsizing_analysis")
-    workflow.add_edge("tier_rightsizing_analysis", "finalize")
+    workflow.add_edge("tier_rightsizing_analysis", "instance_consolidation_analysis")
+    workflow.add_edge("instance_consolidation_analysis", "finalize")
     workflow.add_edge("finalize", END)
 
     return workflow.compile()
