@@ -1,0 +1,6 @@
+langgraph
+azure-identity
+azure-mgmt-resource
+azure-mgmt-monitor
+azure-kusto-data
+lxml
