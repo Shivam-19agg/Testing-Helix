@@ -141,3 +141,49 @@ def list_all_apim_instances(subscription_id: str) -> List[Dict[str, Any]]:
             }
         }
     ]
+
+def execute_kql_query(workspace_id: str, query: str) -> List[Dict[str, Any]]:
+    """
+    Executes a Kusto Query Language (KQL) query against a Log Analytics workspace.
+
+    In a real implementation, this would use the azure-kusto-data client to
+    connect to the workspace and execute the query.
+
+    Args:
+        workspace_id: The resource ID of the Log Analytics workspace.
+        query: The KQL query string to execute.
+
+    Returns:
+        A list of dictionaries representing the rows of the query result.
+    """
+    print(f"---AZURE TOOL (MOCK): Executing KQL query in workspace {workspace_id}---")
+    print(f"Query: {query}")
+
+    # This mock data simulates a typical result from querying ApiManagementGatewayLogs
+    # for high-traffic, slow GET operations.
+    if "ApiManagementGatewayLogs" in query and "GET" in query:
+        return [
+            {
+                "OperationId": "get-profile",
+                "ApiId": "/apis/user-profile-api",
+                "RequestMethod": "GET",
+                "RequestCount": 58230,
+                "AvgBackendResponseTime": 0.35  # seconds
+            },
+            {
+                "OperationId": "list-products",
+                "ApiId": "/apis/product-catalog-api",
+                "RequestMethod": "GET",
+                "RequestCount": 102401,
+                "AvgBackendResponseTime": 0.55  # seconds
+            },
+            {
+                "OperationId": "create-profile",
+                "ApiId": "/apis/user-profile-api",
+                "RequestMethod": "POST",  # Should be ignored by the caching logic
+                "RequestCount": 1500,
+                "AvgBackendResponseTime": 0.20
+            }
+        ]
+
+    return []
