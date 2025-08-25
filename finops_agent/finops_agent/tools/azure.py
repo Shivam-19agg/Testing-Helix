@@ -161,7 +161,7 @@ def execute_kql_query(workspace_id: str, query: str) -> List[Dict[str, Any]]:
 
     # This mock data simulates a typical result from querying ApiManagementGatewayLogs
     # for high-traffic, slow GET operations.
-    if "ApiManagementGatewayLogs" in query and "GET" in query:
+    if "ApiManagementGatewayLogs" in query and "summarize" in query:
         return [
             {
                 "OperationId": "get-profile",
@@ -185,5 +185,38 @@ def execute_kql_query(workspace_id: str, query: str) -> List[Dict[str, Any]]:
                 "AvgBackendResponseTime": 0.20
             }
         ]
+    elif "ApiManagementGatewayLogs" in query and "count" in query:
+        # This simulates the deep-dive query to confirm zero traffic for a specific asset.
+        if "old-legacy-api" in query or "get-user-v1" in query:
+            # These are truly abandoned.
+            return [{"RequestCount": 0}]
+        elif "product-api" in query:
+            # This one had a burst of traffic recently, so it's not abandoned.
+            return [{"RequestCount": 5}]
+        else:
+            return [{"RequestCount": 100}] # Default for other assets
 
+    return []
+
+def get_azure_policy_results(policy_definition_id: str) -> List[str]:
+    """
+    Simulates fetching results from an Azure Policy assignment.
+
+    Args:
+        policy_definition_id: The definition ID of the policy to query.
+
+    Returns:
+        A list of resource IDs for non-compliant resources.
+    """
+    print(f"---AZURE TOOL (MOCK): Fetching Azure Policy results for {policy_definition_id}---")
+
+    # Check if it's the policy we care about for this node
+    if "c82362a3-b5c3-4b39-95c9-441a14a09c2d" in policy_definition_id:
+        # These are the assets initially flagged by the policy as having no traffic
+        # in the last 30 days. The analysis node will then verify this over a longer period.
+        return [
+            "/subscriptions/subid/resourceGroups/rg/providers/Microsoft.ApiManagement/service/apim1/apis/old-legacy-api",
+            "/subscriptions/subid/resourceGroups/rg/providers/Microsoft.ApiManagement/service/apim1/apis/user-api/operations/get-user-v1", # An old version of an operation
+            "/subscriptions/subid/resourceGroups/rg/providers/Microsoft.ApiManagement/service/apim1/apis/product-api" # This one will have recent traffic in our deep-dive query
+        ]
     return []
