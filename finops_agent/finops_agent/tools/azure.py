@@ -220,3 +220,65 @@ def get_azure_policy_results(policy_definition_id: str) -> List[str]:
             "/subscriptions/subid/resourceGroups/rg/providers/Microsoft.ApiManagement/service/apim1/apis/product-api" # This one will have recent traffic in our deep-dive query
         ]
     return []
+
+def list_apis(apim_instance_id: str) -> List[Dict[str, Any]]:
+    """Simulates listing the APIs for a given APIM instance."""
+    print(f"---AZURE TOOL (MOCK): Listing APIs for instance {apim_instance_id}---")
+    return [
+        {"id": f"{apim_instance_id}/apis/echo-api", "name": "Echo API"},
+        {"id": f"{apim_instance_id}/apis/user-api", "name": "User API"},
+    ]
+
+def list_products(apim_instance_id: str) -> List[Dict[str, Any]]:
+    """Simulates listing the Products for a given APIM instance."""
+    print(f"---AZURE TOOL (MOCK): Listing Products for instance {apim_instance_id}---")
+    return [
+        {"id": f"{apim_instance_id}/products/starter", "name": "Starter"},
+        {"id": f"{apim_instance_id}/products/unlimited", "name": "Unlimited"},
+    ]
+
+def get_apim_policy_xml(asset_id: str) -> str:
+    """
+    Simulates fetching the policy XML for an APIM asset (API or Product).
+    """
+    print(f"---AZURE TOOL (MOCK): Fetching policy XML for {asset_id}---")
+    # Return a policy that is missing a rate limit for the 'user-api'
+    if "apis/user-api" in asset_id:
+        return """
+<policies>
+    <inbound>
+        <base />
+        <set-header name="X-Request-Context-Data" exists-action="override">
+            <value>@(context.Deployment.Region)</value>
+        </set-header>
+    </inbound>
+    <backend>
+        <base />
+    </backend>
+    <outbound>
+        <base />
+    </outbound>
+    <on-error>
+        <base />
+    </on-error>
+</policies>
+"""
+    # Return a policy that includes a rate limit for all other assets
+    else:
+        return """
+<policies>
+    <inbound>
+        <rate-limit-by-key calls="10" renewal-period="60" counter-key="@(context.Subscription.Id)" />
+        <base />
+    </inbound>
+    <backend>
+        <base />
+    </backend>
+    <outbound>
+        <base />
+    </outbound>
+    <on-error>
+        <base />
+    </on-error>
+</policies>
+"""
