@@ -22,23 +22,35 @@ def get_apim_properties(resource_id: str) -> Dict[str, Any]:
 
     # This mock data simulates different types of APIM instances.
     if "apim-prod-eus" in resource_id:
-        # Simulates an overprovisioned Premium instance
+        # Simulates an overprovisioned Premium instance with some insecure settings
         return {
             "name": "apim-prod-eus",
             "sku": {"name": "Premium", "capacity": 2},
             "properties": {
-                "virtualNetworkType": "External", # VNet enabled
-                "additionalLocations": [] # Not multi-region
+                "virtualNetworkType": "External",
+                "additionalLocations": [],
+                "publicIpAddressId": "/subscriptions/subid/resourceGroups/rg/providers/Microsoft.Network/publicIPAddresses/apim-prod-eus-pip", # Public IP indicates public management endpoint
+                "customProperties": {
+                    "Microsoft.WindowsAzure.ApiManagement.Gateway.Security.Protocols.Tls10": "True", # Insecure
+                    "Microsoft.WindowsAzure.ApiManagement.Gateway.Security.Protocols.Tls11": "True", # Insecure
+                    "Microsoft.WindowsAzure.ApiManagement.Gateway.Security.Ciphers.TripleDes168": "True" # Insecure
+                }
             }
         }
     elif "apim-dev-wus" in resource_id:
-        # Simulates a correctly provisioned Developer instance
+        # Simulates a more secure Developer instance
          return {
             "name": "apim-dev-wus",
             "sku": {"name": "Developer", "capacity": 1},
             "properties": {
                 "virtualNetworkType": "None",
-                "additionalLocations": []
+                "additionalLocations": [],
+                "publicIpAddressId": None, # No public management endpoint
+                "customProperties": {
+                    "Microsoft.WindowsAzure.ApiManagement.Gateway.Security.Protocols.Tls10": "False",
+                    "Microsoft.WindowsAzure.ApiManagement.Gateway.Security.Protocols.Tls11": "False",
+                    "Microsoft.WindowsAzure.ApiManagement.Gateway.Security.Ciphers.TripleDes168": "False"
+                }
             }
         }
     else:

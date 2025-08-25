@@ -17,6 +17,7 @@ from .nodes.analysis.instance_consolidation import instance_consolidation_analys
 from .nodes.analysis.strategic_caching import strategic_caching_analysis_node
 from .nodes.analysis.unused_asset_decommissioning import unused_asset_decommissioning_node
 from .nodes.analysis.rate_limit_policy import throttling_policy_enforcement_node
+from .nodes.analysis.security_hardening import security_hardening_node
 
 
 # --- Core Workflow Functions ---
@@ -65,6 +66,7 @@ def build_graph():
     workflow.add_node("strategic_caching_analysis", strategic_caching_analysis_node)
     workflow.add_node("unused_asset_decommissioning_analysis", unused_asset_decommissioning_node)
     workflow.add_node("throttling_policy_enforcement_analysis", throttling_policy_enforcement_node)
+    workflow.add_node("security_hardening_analysis", security_hardening_node)
     workflow.add_node("finalize", finalize_node)
 
     # Define the workflow edges to run sequentially for now
@@ -74,7 +76,8 @@ def build_graph():
     workflow.add_edge("instance_consolidation_analysis", "strategic_caching_analysis")
     workflow.add_edge("strategic_caching_analysis", "unused_asset_decommissioning_analysis")
     workflow.add_edge("unused_asset_decommissioning_analysis", "throttling_policy_enforcement_analysis")
-    workflow.add_edge("throttling_policy_enforcement_analysis", "finalize")
+    workflow.add_edge("throttling_policy_enforcement_analysis", "security_hardening_analysis")
+    workflow.add_edge("security_hardening_analysis", "finalize")
     workflow.add_edge("finalize", END)
 
     return workflow.compile()
